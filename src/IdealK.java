@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class IdealK {
 
@@ -19,66 +20,90 @@ public class IdealK {
 		ArrayList<double[]> testData = new ArrayList<>();
 		ArrayList<String> trainingClassification = new ArrayList<>();
 		ArrayList<String> testClassification = new ArrayList<>();
-		ArrayList<String> columnHeaders;
 		
 		if ((new File(TEST_FILE_PATH)).isFile() && (new File(TRAINING_FILE_PATH)).isFile()) {
 			String trainingColumnHeaders = readFeatureFile(TRAINING_FILE_PATH, trainingData, trainingClassification);
 			String testColumnHeaders = readFeatureFile(TEST_FILE_PATH, testData, testClassification);
 			
 			if (trainingColumnHeaders.equals(testColumnHeaders)) {
-				columnHeaders = getColumnHeaders(trainingColumnHeaders);
+				findIdealK(trainingData, trainingClassification, testData, testClassification);
 			} else {
 				System.err.println("Features inconsistent between Test File and Training File (mismatching headers).");
-				findIdealK(trainingData, trainingClassification, testData, testClassification);
 			}
 		} else {
 			System.err.println("Test File or Training File does not exist.");
 		}
 	}
 	
-	public static void findIdealK(ArrayList<double[]> trainingData, ArrayList<String> trainingClassification, ArrayList<double[]> testData, ArrayList<String> testClassification) {
-		ArrayList<Double> accuracy = new ArrayList<>();
+	public static int findIdealK(ArrayList<double[]> trainingData, ArrayList<String> trainingClassification, ArrayList<double[]> testData, ArrayList<String> testClassification) {
+		HashMap<Integer,Integer> accuracy = new HashMap<>();
 		int numFeatures = trainingData.get(0).length;
+		int numTestData = testData.size();
 		
 		
-		for (double[] test : testData) {
+		for (int i = 0; i < numTestData; i++) {
+			double[] test = testData.get(i);
+			String actualClassification = testClassification.get(i);
+			
 			ArrayList<DistObj> distanceObjects = KnnUtilities.performKNN(trainingData, test);
 			for (int k = 1; k <= numFeatures; k++) {
-				int[] indices = new int[k];
-				for (int i = 0; i < k; i++) {
-					indices[i] = distanceObjects.get(i).index;
+				String predictedClassification = getPredictedClassification(distanceObjects, trainingClassification, k);
+				
+				if (actualClassification.equals(predictedClassification)) {
+					Integer count = accuracy.get(k);
+					accuracy.put(k, count==null?1:count+1);
 				}
-				
-				
-			}
-			
-			
-			
+			}	
 		}
 		
+		int idealK = 0;
+		int idealKFrequency = 0;
+		
+		for (int k : accuracy.keySet()) {
+			int frequency = accuracy.get(k);
+			
+			if (frequency > idealKFrequency) {
+    			idealKFrequency = frequency;
+    			idealK = k;
+    		}
+			
+			double acc = ((double) frequency) / numTestData;
+			System.out.println("Accuracy for k = " + k + ": " + frequency + "/" + numTestData + " = " + acc);
+		}
+		
+		System.out.println("Ideal k = " + idealK);
+		
+		return idealK;
 	}
-		/*
-		arraylist accuracy of doubles
+	
+	public static String getPredictedClassification(ArrayList<DistObj> distanceObjects, ArrayList<String> trainingClassification, int k) {
 		
-		for each testdata in testFile
-		distobjects = performknn
-			for k = 1 to numfeatures
-				indices = indices of 1st k objects in distobjects
-				test classification = majority classification of features with indices "indices"
-				if training classification = test classification 
-					accuracy[k]++
-					
-		for i = 1 to numfeatures
-			if accuracy[i] is max
-				maxindex = i
-				maxaccuracy = accuracy[i]
-						
-		maxaccuracy /= numfeatures;
+		HashMap<String,Integer> numOccurances = new HashMap<>();
+		for (int i = 0; i < k; i++) {
+			int index = distanceObjects.get(i).index;
+			String classification = trainingClassification.get(index);
+			
+			Integer count = numOccurances.get(classification);
+			numOccurances.put(classification, count==null?1:count+1);
+		}
 		
+		String classification = "";
+		int max = 0;
 		
+		for (String key : numOccurances.keySet()) {
+			int val = numOccurances.get(key);
+			
+			if (val > max) {
+    			max = val;
+    			classification = key;
+    		}
+		}
 		
-		print maxaccurcy and maxindex
-	}*/
+		System.out.println("Classification for k = " + k + ": " + classification + ", " + max + "/" + k);
+		
+		return classification;
+		
+	}
 	
 	public static String readFeatureFile(String featureFilePath, ArrayList<double[]> featureData, ArrayList<String> featureClassification) {
 		String columnHeaders = "";
@@ -116,18 +141,5 @@ public class IdealK {
         }
 		
 		return columnHeaders;
-	}
-	
-    private static ArrayList<String> getColumnHeaders(String line) {
-    	ArrayList<String> columnHeaders = new ArrayList<>();
-    	
-    	String dataCompsStr[] = line.substring(line.indexOf(",") + 1).split(",");
-    	
-    	for (String feature : dataCompsStr) {
-    		columnHeaders.add(feature);
-    	}
-    	
-    	return columnHeaders;
-    }
-	
+	}	
 }
