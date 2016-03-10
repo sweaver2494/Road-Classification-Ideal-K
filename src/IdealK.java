@@ -7,9 +7,11 @@ import java.util.HashMap;
 
 public class IdealK {
 
-	private static String TRAINING_FILE_PATH = "Data/FeatureFiles/features_0_nomag.csv";
+	private static String TRAINING_FILE_PATH = "Data/TrainingData/training_data.csv";
     //Must include. This is the file you want to test against feature files
-    private static String TEST_FILE_PATH = "Data/TestData/testData.csv";
+    private static String TEST_FILE_PATH = "Data/TestData/test_data.csv";
+    //Knn will be tested from k=1 to k=MAX_K_VALUE
+    private static int MAX_K_VALUE = 3;
     
 	public static void main(String[] args) {
 		
@@ -37,16 +39,17 @@ public class IdealK {
 	
 	public static int findIdealK(ArrayList<double[]> trainingData, ArrayList<String> trainingClassification, ArrayList<double[]> testData, ArrayList<String> testClassification) {
 		HashMap<Integer,Integer> accuracy = new HashMap<>();
-		int numFeatures = trainingData.get(0).length;
 		int numTestData = testData.size();
+		int maxK = MAX_K_VALUE;
 		
-		
+		System.out.println("-----------------------------------");
+		//For each test data point, perform KNN using k=1 to k=maxK
 		for (int i = 0; i < numTestData; i++) {
 			double[] test = testData.get(i);
 			String actualClassification = testClassification.get(i);
 			
 			ArrayList<DistObj> distanceObjects = KnnUtilities.performKNN(trainingData, test);
-			for (int k = 1; k <= numFeatures; k++) {
+			for (int k = 1; k <= maxK; k++) {
 				String predictedClassification = getPredictedClassification(distanceObjects, trainingClassification, k);
 				
 				if (actualClassification.equals(predictedClassification)) {
@@ -56,8 +59,11 @@ public class IdealK {
 			}	
 		}
 		
-		int idealK = 0;
+		int idealK = 0; // the lowest k with the highest classification
 		int idealKFrequency = 0;
+		
+		System.out.println("-----------------------------------");
+		//For each k value, print out the percentage of correctly classified tests using that k for KNN.
 		
 		for (int k : accuracy.keySet()) {
 			int frequency = accuracy.get(k);
@@ -71,11 +77,14 @@ public class IdealK {
 			System.out.println("Accuracy for k = " + k + ": " + frequency + "/" + numTestData + " = " + acc);
 		}
 		
+		System.out.println("-----------------------------------");
+		// idealK is the lowest k with the highest classification
 		System.out.println("Ideal k = " + idealK);
 		
 		return idealK;
 	}
 	
+	//Return the results of KNN (predicted classification) using k. Print out the percentage of training data that the test data matched up with
 	public static String getPredictedClassification(ArrayList<DistObj> distanceObjects, ArrayList<String> trainingClassification, int k) {
 		
 		HashMap<String,Integer> numOccurances = new HashMap<>();
@@ -99,7 +108,7 @@ public class IdealK {
     		}
 		}
 		
-		System.out.println("Classification for k = " + k + ": " + classification + ", " + max + "/" + k);
+		System.out.println("Classification for " + classification + ", k = " + k + ": " + max + "/" + k);
 		
 		return classification;
 		
