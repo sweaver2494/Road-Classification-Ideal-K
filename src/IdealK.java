@@ -1,3 +1,7 @@
+/*
+ *
+ * @author Scott Weaver
+ */
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -37,7 +41,7 @@ public class IdealK {
 		}
 	}
 	
-	public static int findIdealK(ArrayList<double[]> trainingData, ArrayList<String> trainingClassification, ArrayList<double[]> testData, ArrayList<String> testClassification) {
+	private static void findIdealK(ArrayList<double[]> trainingData, ArrayList<String> trainingClassification, ArrayList<double[]> testData, ArrayList<String> testClassification) {
 		HashMap<Integer,Integer> accuracy = new HashMap<>();
 		int numTestData = testData.size();
 		int maxK = MAX_K_VALUE;
@@ -80,12 +84,10 @@ public class IdealK {
 		System.out.println("-----------------------------------");
 		// idealK is the lowest k with the highest classification
 		System.out.println("Ideal k = " + idealK);
-		
-		return idealK;
 	}
 	
 	//Return the results of KNN (predicted classification) using k. Print out the percentage of training data that the test data matched up with
-	public static String getPredictedClassification(ArrayList<DistObj> distanceObjects, ArrayList<String> trainingClassification, int k) {
+	private static String getPredictedClassification(ArrayList<DistObj> distanceObjects, ArrayList<String> trainingClassification, int k) {
 		
 		HashMap<String,Integer> numOccurances = new HashMap<>();
 		for (int i = 0; i < k; i++) {
@@ -114,7 +116,7 @@ public class IdealK {
 		
 	}
 	
-	public static String readFeatureFile(String featureFilePath, ArrayList<double[]> featureData, ArrayList<String> featureClassification) {
+	private static String readFeatureFile(String featureFilePath, ArrayList<double[]> featureData, ArrayList<String> featureClassification) {
 		String columnHeaders = "";
 		
 		try {
@@ -126,8 +128,6 @@ public class IdealK {
 	        String line = bufferedReader.readLine();
 	        int dataSize = line.length() - line.replace(",", "").length();
 	
-	        double dataAvg[] = new double[dataSize];
-	
 	        while (line != null) {
 	        	String classification = line.substring(0, line.indexOf(","));
 	            String dataCompsStr[] = line.substring(line.indexOf(",") + 1).split(",");
@@ -136,7 +136,6 @@ public class IdealK {
 	
 	            for (int i = 0; i < dataSize; i++) {
 	                dataComps[i] = Double.parseDouble(dataCompsStr[i]);
-	                dataAvg[i] += dataComps[i];
 	            }
 	
 	            featureData.add(dataComps);
