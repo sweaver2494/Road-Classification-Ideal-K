@@ -46,7 +46,9 @@ public class IdealK {
 		int numTestData = testData.size();
 		int maxK = MAX_K_VALUE;
 		
+		System.out.println();
 		System.out.println("-----------------------------------");
+		System.out.println("KNN Classification Accuracy");
 		//For each test data point, perform KNN using k=1 to k=maxK
 		for (int i = 0; i < numTestData; i++) {
 			double[] test = testData.get(i);
@@ -66,7 +68,9 @@ public class IdealK {
 		int idealK = 0; // the lowest k with the highest classification
 		int idealKFrequency = 0;
 		
+		System.out.println();
 		System.out.println("-----------------------------------");
+		System.out.println("KNN Total Accuracy");
 		//For each k value, print out the percentage of correctly classified tests using that k for KNN.
 		
 		for (int k : accuracy.keySet()) {
@@ -78,9 +82,10 @@ public class IdealK {
     		}
 			
 			double acc = ((double) frequency) / numTestData;
-			System.out.println("Accuracy for k = " + k + ": " + frequency + "/" + numTestData + " = " + acc);
+			System.out.println("k = " + k + ":\t" + frequency + "/" + numTestData + " = " + acc);
 		}
 		
+		System.out.println();
 		System.out.println("-----------------------------------");
 		// idealK is the lowest k with the highest classification
 		System.out.println("Ideal k = " + idealK);
@@ -110,7 +115,7 @@ public class IdealK {
     		}
 		}
 		
-		System.out.println("Classification for " + classification + ", k = " + k + ": " + max + "/" + k);
+		System.out.println(classification + ":\t\tk = " + k + ":\t" + max + "/" + k);
 		
 		return classification;
 		
