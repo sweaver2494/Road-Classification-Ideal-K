@@ -1,4 +1,7 @@
-/*
+/* For a set of training data, this file predicts the classification of test data
+ * using various k values for KNN.
+ * 
+ * The k value with the overall most accurate classification predictions is the ideal K value.
  *
  * @author Scott Weaver
  */
@@ -54,6 +57,7 @@ public class IdealK {
 			double[] test = testData.get(i);
 			String actualClassification = testClassification.get(i);
 			
+			System.out.println("Actual Classification: " + actualClassification);
 			ArrayList<DistObj> distanceObjects = KnnUtilities.performKNN(trainingData, test);
 			for (int k = 1; k <= maxK; k++) {
 				String predictedClassification = getPredictedClassification(distanceObjects, trainingClassification, k);
@@ -62,7 +66,9 @@ public class IdealK {
 					Integer count = accuracy.get(k);
 					accuracy.put(k, count==null?1:count+1);
 				}
-			}	
+			}
+			System.out.println();
+			
 		}
 		
 		int idealK = 0; // the lowest k with the highest classification
@@ -115,7 +121,7 @@ public class IdealK {
     		}
 		}
 		
-		System.out.println(classification + ":\t\tk = " + k + ":\t" + max + "/" + k);
+		System.out.println("k = " + k + ":\t" + max + "/" + k + "\tpredicted: " + classification);
 		
 		return classification;
 		
