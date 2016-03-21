@@ -18,7 +18,7 @@ public class IdealK {
     //Must include. This is the file you want to test against feature files
     private static String TEST_FILE_PATH = "Data/TestData/test_data.csv";
     //Knn will be tested from k=1 to k=MAX_K_VALUE
-    private static int MAX_K_VALUE = 3;
+    private static int MAX_K_VALUE = 20;
     
 	public static void main(String[] args) {
 		
